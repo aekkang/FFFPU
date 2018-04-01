@@ -7,6 +7,7 @@ import ssl
 import shutil
 # import caloriecounter
 import gcp_interface
+import scale_and_transform
 
 BOT_ACCESS_TOKEN = config.BOT_ACCESS_TOKEN
 ACCESS_TOKEN = config.ACCESS_TOKEN
@@ -136,6 +137,9 @@ class SlackBot():
                 self.send_message('You\'re consuming: %s!' % labels[0], channel)
             else:
                 self.send_message('Nothing detected :(', channel)
+
+            out_name, invden = scale_and_transform.process_image(name)
+            print(out_name)
 
             # nutrition = caloriecounter.count(name)
             # caloriecounter.print_nutrition_info(nutrition)

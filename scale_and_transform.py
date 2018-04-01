@@ -59,7 +59,7 @@ def process_image(fname):
     dst = cv2.warpPerspective(img_copy, M, tuple(list(img_copy.shape)[:2][::-1]), cv2.WARP_INVERSE_MAP)
 
     # export results to file (appending '-transform' to fname)
-    out_name = ''.join(filename.split('.')[:-1]) + '-processed.jpg'
+    out_name = ''.join(fname.split('.')[:-1]) + '-processed.jpg'
     cv2.imwrite(out_name, dst)
 
     # calculate inches per pixel
