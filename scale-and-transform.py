@@ -22,7 +22,7 @@ def process_image(fname):
     # threshold
     ret, thresh = cv2.threshold(smooth, 185, 255, cv2.THRESH_BINARY)
 
-    # erode-blur-blur-erode
+    # erode-blur-blur-erode (some hacky magic shit)
     kernel = np.ones((3, 3), np.uint8)
     thresh = cv2.erode(thresh, kernel)
     thresh = cv2.blur(thresh, (32, 32))
