@@ -179,7 +179,7 @@ class SlackBot():
                     #         foods.append(labels[j])
                     #         break
                     #########TODO
-                    volumes = [food_volumes[i - 1] / 50000] * len(labels)
+                    volumes = [food_volumes[i - 1]] * len(labels)
                     print(labels, volumes)
                     food = nx_interface.nutritional_info(labels, volumes)
                     print(food)
