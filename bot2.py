@@ -68,8 +68,6 @@ class SlackBot():
         """
         pass
 
-
-
     def handle_event(self, rtm_event):
         """
         @brief      Event handler.
@@ -80,12 +78,13 @@ class SlackBot():
             return
 
         event = rtm_event[0]
-        print(event)
         channel = event['channel']
         if 'file' in event and 'mimetype' in event['file'] and 'image' in event['file']['mimetype']:
             file_id = event['file']['id']
             self.send_message('Computing calories...', channel)
             name = str(event['file']['name'])
+            ext = name.split('.')[-1]
+            name = 'images/' + event['username'] + '.' + ext
             self.download_image(event['file']['url_private_download'], name)
             print('Downloaded %s' % file_id)
 
