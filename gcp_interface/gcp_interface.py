@@ -6,6 +6,7 @@ import re
 API_KEY = 'gcp_api_key.txt'
 TEST_IMGS = ['gcp_examples/' + i for i in ['burger.jpg', 'chips.jpg', 'fries.jpg', 'pie.jpg', 'ramen.jpg', 'sandwich.jpg']]
 BLACKLIST = ['[a-z ]*food', '[a-z ]*dish', '[a-z ]*cuisine', 'snack', 'ingredient', 'flavor', 'baking', 'baked goods']
+N_RESULTS = 10
 
 
 # Encode an image to a base64-encoded string.
@@ -25,12 +26,12 @@ def parse_inputs(api_key_filename, img_filename):
     return api_key, b64
 
 # Call the API and get parsed results.
-def call_api(api_key, b64):
+def call_label_detection(api_key, b64):
     # API call!
     response = requests.post('https://vision.googleapis.com/v1/images:annotate?key=%s' % api_key,
         json = {'requests': [{
             'image': {'content': b64},
-            'features': [{'type': 'LABEL_DETECTION', 'maxResults': '10'}]}
+            'features': [{'type': 'LABEL_DETECTION', 'maxResults': str(N_RESULTS)}]}
         ]})
 
     # Get and parse API call results.
@@ -63,9 +64,9 @@ def refine_results(results):
 # The output is a list of candidate foods of the image.
 #
 # See section below for usage.
-def main(api_key_filename, img_filename):
+def gcp_labeller(api_key_filename, img_filename):
     api_key, b64 = parse_inputs(api_key_filename, img_filename)
-    results = call_api(api_key, b64)
+    results = call_label_detection(api_key, b64)
     results = refine_results(results)
 
     return results
@@ -73,7 +74,7 @@ def main(api_key_filename, img_filename):
 
 if __name__ == '__main__':
     for TEST_IMG in TEST_IMGS:
-        results = main(API_KEY, TEST_IMG)
+        results = gcp_labeller(API_KEY, TEST_IMG)
         print()
         print('Results of API call on %s' % TEST_IMG)
         print('=' * 50)
