@@ -5,8 +5,8 @@ import re
 
 API_KEY = 'gcp_interface/gcp_api_key.txt'
 TEST_IMGS = ['gcp_interface/gcp_examples/' + i for i in ['burger.jpg', 'chips.jpg', 'fries.jpg', 'pie.jpg', 'ramen.jpg', 'sandwich.jpg']]
-BLACKLIST = ['[a-z ]*food', '[a-z ]*dish', '[a-z ]*cuisine', 'snack', 'ingredient', 'flavor', 'baking', 'baked goods']
-N_RESULTS = 10
+BLACKLIST = ['[a-z ]*food', '[a-z ]*dish', '[a-z ]*cuisine', 'snack', 'ingredient', 'flavor', 'baking', 'baked goods', 'meal', 'breakfast', 'lunch', 'dinner', 'drink']
+N_RESULTS = 20
 
 
 # Encode an image to a base64-encoded string.
