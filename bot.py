@@ -5,9 +5,10 @@ import requests
 from time import sleep
 import ssl
 import shutil
-# import caloriecounter
+import nx_interface
 import gcp_interface
 import scale_and_transform
+import food_volume
 
 BOT_ACCESS_TOKEN = config.BOT_ACCESS_TOKEN
 ACCESS_TOKEN = config.ACCESS_TOKEN
@@ -159,13 +160,20 @@ class SlackBot():
             out_name, invden = scale_and_transform.process_image(name)
             print(out_name)
 
-            # nutrition = caloriecounter.count(name)
-            # caloriecounter.print_nutrition_info(nutrition)
-            
+            ### SEGMENTATION STUFF
+
             # COMMENT THIS OUT AFTER ADDING IN CALORIE CODE
-            self.update(prename, 0, 0)
-            self.update(prename, -1, -1)
-            ### INSERT CALORIE CODE HERE
+            # self.update(prename, 0, 0)
+            # self.update(prename, -1, -1)
+
+            ### VOLUME ESTIMATION, RETRIEVE NUTRITION INFORMATION
+            ### TODO: actually create the needed segmentation variables
+            
+            food_volumes = food_volume.volume_estimation(birdseye_segmented,
+                angle_segmented, invden, list_of_foods)
+            nutrition_info = nx_interface.nutritional_info(list_of_foods,
+                food_volumes)
+
             ############self.update(prename, 100, 0.1)
         elif 'type' in event and event['type'] == 'message':
             message = event['text']
