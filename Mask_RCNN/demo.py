@@ -7,6 +7,7 @@ import skimage.io
 import time
 import matplotlib
 import matplotlib.pyplot as plt
+import scipy.misc
 
 import coco
 import utils
@@ -58,7 +59,7 @@ class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
                'teddy bear', 'hair drier', 'toothbrush']
 print('beginning inference')
 #filenames = ['hackathon.jpg', 'hack1.jpg', 'hack2.jpg', 'hack3.jpg']
-filenames = ['cheeza.jpg', 'cheeza2.jpg', 'cheeza3.jpg']
+filenames = ['cheeza.jpg']
 times = []
 for filename in filenames:
     start = time.time()
@@ -75,3 +76,21 @@ for filename in filenames:
 
     np.savetxt(filename[:-4] + '_mask.txt', collapse_segmentation(r), fmt='%d')
 print(times)
+
+def segment_image(filename):
+    """segments an image, outputting segmentted masks and files with
+    the segmented masked applied."""
+    start = time.time()
+    image = skimage.io.imread(filename)
+    results = model.detect([image], verbose=0)
+    r = results[0]['masks']
+    end = time.time()
+    print(end - start)
+
+    for i in range(len(r[0][0])):
+        scipy.misc.imsave(filename[:-4] + str(i + 1) + '.jpg', image * \
+                          np.reshape(r[:,:, i], (r.shape[0], r.shape[1], 1)))
+    np.savetxt(filename[:-4] + '_mask.txt', collapse_segmentation(r), fmt='%d')
+
+segment_image('cheeza3.jpg')
+        
