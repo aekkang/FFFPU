@@ -14,8 +14,8 @@ def get_area(seg_matrix, idx):
 	return np.count_nonzero(seg_matrix == idx)
 
 def get_heights(seg_matrix, idx):
-	for row in seg_matrix:
-		if idx in row
+	min_row = np.where(seg_matrix == idx)[0][0]
+	max_row = np.where(seg_matrix == idx)[-1][-1]
 	return abs(max_row - min_row)
 
 def volume_estimation(birdseye, angle, in_p_pxl, foods):
