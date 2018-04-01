@@ -1,0 +1,7 @@
+to run:
+$ python3 bot2.py
+and wait for connection. terminal will print out errors, which mostly can be ignored.
+
+go to your slack and click the plus sign next to apps and add fffpu. this opens up a chat with fffpu. send it an image, and see it download it to your directory.
+
+however, this image is corrupted, and i've no idea how to fix it. i've tried different packages, different ways of downloading the image, but everything ends up corrupted.
