@@ -203,8 +203,8 @@ class SlackBot():
                     calories = sum([i['calories'] for i in food]) / len(food)
                     sodium = sum([i['sodium'] for i in food]) / len(food)
                     self.send_message('%s!' % ' / '.join(food_name).capitalize(), channel)
-                    self.send_message('    - Calories: %g' % calories, channel)
-                    self.send_message('    - Sodium: %g' % sodium, channel)
+                    self.send_message('    - Calories: %g kCal' % calories, channel)
+                    self.send_message('    - Sodium: %g mg' % sodium, channel)
             # elif len(foods) == 1:
             #     food = foods[0]
             #     food_name = [i['name'] for i in food]
