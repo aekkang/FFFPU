@@ -1,0 +1,8 @@
+first checkout slack, then save config.py
+
+to run:
+$ source fffpu/bin/activate
+$ python3 bot2.py
+and wait for connection. terminal will print out errors, which mostly can be ignored.
+
+go to your slack and click the plus sign next to apps and add fffpu. this opens up a chat with fffpu. send it an image, and see it download it to the images/ directory named by your username.
