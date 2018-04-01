@@ -133,7 +133,7 @@ class SlackBot():
 
             labels = gcp_interface.gcp_labeller(GCP_API_KEY, name)
             if len(labels) > 0:
-                self.send_message('You\'re eating: %s!' % labels[0], channel)
+                self.send_message('You\'re consuming: %s!' % labels[0], channel)
             else:
                 self.send_message('Nothing detected :(', channel)
 
