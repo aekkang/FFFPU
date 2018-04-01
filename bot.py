@@ -72,7 +72,7 @@ class SlackBot():
         """
         pass
 
-    def update(self, name, add_calories, add_sodium):
+    def update(self, name, add_calories, add_sodium, calorielimit=None, sodiumlimit=None):
         """
         @brief      Update user's caloric info.
         
@@ -93,23 +93,38 @@ class SlackBot():
             # update user
             users[name]['currcalories'] += add_calories
             users[name]['currsodium'] += add_sodium
-            users[name]['num_meals'] += 1
+            if not calorielimit and not sodiumlimit:
+                users[name]['num_meals'] += 1
+            if calorielimit:
+                users[name]['calorielimit'] = calorielimit
+            if sodiumlimit:
+                users[name]['sodiumlimit'] = sodiumlimit
         elif name not in users:
             users[name] = {'name': name, 
                            'currcalories': add_calories,
+                           'calorielimit': 2200, # default
                            'currsodium': add_sodium,
+                           'sodiumlimit': 2300, # milligrams
                            'num_meals': 1
                            }
         elif add_calories < 0 or add_sodium < 0:
-            users[name] = {'name': name,
-                           'currcalories': 0,
-                           'currsodium': 0,
-                           'num_meals': 0}
+            users[name]['currcalories'] = 0
+            users[name]['currsodium'] = 0
+            users[name]['num_meals'] = 0
 
         # save file
         with open('fffdb.txt', 'w') as f:
             for key, value in users.items():
                 f.write(str(value) + '\n')
+
+    def display(self, name, channel):
+        with open('fffdb.txt', 'r') as f:
+            for line in f:
+                temp = eval(line)
+                if temp['name'] == name:
+                    break
+
+        self.send_message('*SUMMARY:*\n\nCalorie count/limit: %d/%d\nRemaining calories: %d calories\n\nSodium count/limit: %d/%d mg\nRemaining sodium: %d mg\n\nNumber of meals: %d\nAverage calories/meal: %d\nAverage sodium (mg)/meal: %d' % (temp['currcalories'], temp['calorielimit'], temp['calorielimit']-temp['currcalories'], temp['currsodium'], temp['sodiumlimit'], temp['sodiumlimit'] - temp['currsodium'], temp['num_meals'], temp['currcalories'] / temp['num_meals'] if temp['num_meals'] != 0 else 0, temp['currsodium'] / temp['num_meals'] if temp['num_meals'] != 0 else 0), channel)
 
     def handle_event(self, rtm_event):
         """
@@ -121,13 +136,16 @@ class SlackBot():
             return
 
         event = rtm_event[0]
+        if 'channel' not in event or 'user' not in event:
+            return
+
         channel = event['channel']
+        prename = event['user']
         if 'file' in event and 'mimetype' in event['file'] and 'image' in event['file']['mimetype']:
             file_id = event['file']['id']
             self.send_message('Computing nutritional information...', channel)
             name = str(event['file']['name'])
             ext = name.split('.')[-1]
-            prename = event['username']
             name = 'images/' + prename + '.' + ext
             self.download_image(event['file']['url_private_download'], name)
             print('Downloaded %s' % file_id)
@@ -143,10 +161,39 @@ class SlackBot():
 
             # nutrition = caloriecounter.count(name)
             # caloriecounter.print_nutrition_info(nutrition)
-            self.update(prename, -1, 0)
-            # self.update(prename, 100, 0.1)
+            
+            # COMMENT THIS OUT AFTER ADDING IN CALORIE CODE
+            self.update(prename, 0, 0)
+            self.update(prename, -1, -1)
+            ### INSERT CALORIE CODE HERE
+            ############self.update(prename, 100, 0.1)
+        elif 'type' in event and event['type'] == 'message':
+            message = event['text']
+            if 'set calorie ' in message:
+                climit = int(message.replace('set calorie ', '').strip())
+                print('Setting calorie limit to: %d' % climit)
+                self.update(prename, 0, 0, climit, 0)
+                self.send_message('Set calorie limit to: %d' % climit, channel)
+            elif 'set sodium ' in message:
+                slimit = int(message.replace('set sodium ', '').strip())
+                print('Setting sodium limit to: %d' % slimit)
+                self.update(prename, 0, 0, 0, slimit)
+                self.send_message('Set sodium limit to: %d' % slimit, channel)
+            elif 'clear' in message:
+                print('Clearing daily counts.')
+                self.update(prename, -1, -1)
+                self.send_message('Cleared!', channel)
+            elif 'end' in message or 'display' in message:
+                if 'end' in message:
+                    self.update(prename, -1, -1)
+                self.display(prename, channel)
+            elif 'help' in message:
+                self.send_message('Available commands:\n\ndisplay:\tDisplays current counts and limits.\nset calorie [number]:\tSet the calories limit.\nset sodium [number]:\tSet the sodium limit.\nclear:\tClear the daily counts.\nend:\tEnd the day! Display and clear counts.', channel)
+
         # elif check for 'end'
         # elif check for 'clear'
+        # elif check for 'display'
+        # elif check for 'set calorie' or 'set sodium'
 
     def activate(self):
         """

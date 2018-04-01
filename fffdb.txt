@@ -1,2 +1,1 @@
-{'currsodium': 0, 'name': 'akang', 'num_meals': 0, 'currcalories': 0}
-{'currsodium': 0, 'name': 'johnguackmbl', 'num_meals': 0, 'currcalories': 0}
+{'name': 'U9U02D03B', 'currcalories': 0, 'calorielimit': 1500, 'currsodium': 0, 'sodiumlimit': 2500, 'num_meals': 0}
