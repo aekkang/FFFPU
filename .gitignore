@@ -1,4 +1,5 @@
 gcp_interface/gcp_api_key.txt
+nutritionix_keys
 config.py
 __pycache__
 *.pyc

@@ -153,23 +153,47 @@ class SlackBot():
             print('Downloaded %s' % file_id)
 
             n = demo.segment_image(name)
+            out_name, invden = scale_and_transform.process_image(name)
+            food_volumes = food_volume.volume_estimation('%s_mask.txt' % name, '%s_mask.txt' % out_name, invden, foods)
+
             foods = []
             for i in range(1, n):
                 segmented = '%s_%d.jpg' % (name[:-4], i)
                 labels = gcp_interface.gcp_labeller(GCP_API_KEY, segmented)
-                print(segmented, i, labels)
+                print(segmented, labels)
                 if len(labels) > 0:
-                    for j in range(len(labels)):
-                        if labels[j] not in foods:
-                            foods.append(labels[j])
-                            break
+                    # for j in range(len(labels)):
+                    #     if labels[j] not in foods:
+                    #         foods.append(labels[j])
+                    #         break
+                    #########TODO
+                    food = nx_interface.nutritional_info(labels, [1] * len(labels))
 
-            if len(foods) > 1:
-                self.send_message('You\'re consuming:' % foods[0], channel)
+                    processed = []
+                    already = []
+                    for i in food:
+                        if i['name'] not in already:
+                            already.append(i['name'])
+                            processed.append(i)
+                    food = processed
+
+                    if len(food) > 0:
+                        foods.append(food[:3])
+                        print(food)
+
+            if len(foods) > 0:
+                self.send_message('You\'re consuming:', channel)
                 for food in foods:
-                    self.send_message('\t- %s!' % food, channel)
-            elif len(foods) == 1:
-                self.send_message('You\'re consuming %s!' % foods[0], channel)
+                    food_name = [i['name'] for i in food]
+                    calories = sum([i['calories'] for i in food]) / len(food)
+                    sodium = sum([i['sodium'] for i in food]) / len(food)
+                    self.send_message('%s!' % ' / '.join(food_name).capitalize(), channel)
+                    self.send_message('    - Calories: %g' % calories, channel)
+                    self.send_message('    - Sodium: %g' % sodium, channel)
+            # elif len(foods) == 1:
+            #     food = foods[0]
+            #     food_name = [i['name'] for i in food]
+            #     self.send_message('You\'re consuming %s!' % ' / '.join(food_name), channel)
             else:
                 self.send_message('Nothing detected :(', channel)
 
@@ -185,10 +209,10 @@ class SlackBot():
             ### VOLUME ESTIMATION, RETRIEVE NUTRITION INFORMATION
             ### TODO: actually create the needed segmentation variables
             
-            food_volumes = food_volume.volume_estimation(birdseye_segmented,
-                angle_segmented, invden, list_of_foods)
-            nutrition_info = nx_interface.nutritional_info(list_of_foods,
-                food_volumes)
+            # food_volumes = food_volume.volume_estimation(birdseye_segmented,
+            #     angle_segmented, invden, list_of_foods)
+            # nutrition_info = nx_interface.nutritional_info(list_of_foods,
+            #     food_volumes)
 
             ############self.update(prename, 100, 0.1)
         elif 'type' in event and event['type'] == 'message':

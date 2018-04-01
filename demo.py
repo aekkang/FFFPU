@@ -99,12 +99,15 @@ def segment_image(filename):
                               dtype='uint8')
     collapsed = collapse_segmentation(r)
     for i in range(1, len(r[0][0])):
-        masked_img = image * np.reshape(collapsed == (i),
-                                        (r.shape[0], r.shape[1], 1))
-        masked_img += (masked_img == 0) * noise
+        mask_i = np.reshape(collapsed == (i), (r.shape[0], r.shape[1], 1))
+        # masked_img = image * mask_i
+        # masked_img += (masked_img == 0) * noise
+        # x_lst, y_lst, _ = np.where(mask_i != 0)
+        masked_img = image
+        x_lst, y_lst, _ = np.where(mask_i != 0)
+        masked_img = masked_img[np.min(x_lst):np.max(x_lst), np.min(y_lst):np.max(y_lst)]
         scipy.misc.imsave(filename[:-4] + '_' + str(i) + '.jpg',
                           masked_img)
-
 
     np.savetxt(filename[:-4] + '_mask.txt', collapsed, fmt='%d')
 

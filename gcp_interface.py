@@ -5,7 +5,7 @@ import re
 
 API_KEY = 'gcp_interface/gcp_api_key.txt'
 TEST_IMGS = ['gcp_interface/gcp_examples/' + i for i in ['burger.jpg', 'chips.jpg', 'fries.jpg', 'pie.jpg', 'ramen.jpg', 'sandwich.jpg']]
-BLACKLIST = ['[a-z ]*food', '[a-z ]*dish', '[a-z ]*cuisine', 'snack', 'ingredient', 'flavor', 'baking', 'baked goods', 'meal', 'breakfast', 'lunch', 'dinner', 'drink']
+BLACKLIST = ['[a-z ]*food', '[a-z ]*dish', '[a-z ]*cuisine', 'snack', 'ingredient', 'flavor', 'baking', 'baked goods', 'meal', 'breakfast', 'lunch', 'dinner', 'drink', 'recipe', 'platter']
 N_RESULTS = 20
 
 
@@ -33,6 +33,7 @@ def call_label_detection(api_key, b64):
             'image': {'content': b64},
             'features': [{'type': 'LABEL_DETECTION', 'maxResults': str(N_RESULTS)}]}
         ]})
+    print(response.text)
 
     # Get and parse API call results.
     results = json.loads(response.text)['responses'][0]['labelAnnotations']

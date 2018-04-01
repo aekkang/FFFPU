@@ -46,7 +46,7 @@ def parse_results(results, volumes):
 	output = []
 	for i, result in enumerate(results):
 
-		print result
+		# print(result)
 		# Just get the calorie count, sodium, and serving size for now
 		food_name = result["food_name"]
 		calories = float(result["nf_calories"])
@@ -72,9 +72,16 @@ def parse_results(results, volumes):
 
 def nutritional_info(foods, volumes):
 	headers = get_auth_headers()
-	query_string = make_query(foods)
-	data = { 'query' : query_string }
-	result = requests.post(url = NX_ENDPOINT, data = dumps(data), headers = headers)
-	result.raise_for_status()
-	return parse_results(result.json()["foods"], volumes)
+	results = []
+	for food in foods:
+		query_string = make_query([food])
+		data = { 'query' : query_string }
+		result = requests.post(url = NX_ENDPOINT, data = dumps(data), headers = headers)
+		try:
+			result.raise_for_status()
+			query_result = parse_results(result.json()["foods"], volumes)
+			results.extend(query_result)
+		except:
+			pass
+	return results
 	
