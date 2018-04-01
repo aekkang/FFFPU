@@ -17,7 +17,7 @@ from json import dumps
 NX_ENDPOINT = "https://trackapi.nutritionix.com/v2/natural/nutrients"
 
 def get_auth_headers():
-	with open('nutritionix_keys', 'r')as key_file:
+	with open('nutritionix_keys', 'r') as key_file:
 		app_id = key_file.readline().strip()
 		app_key = key_file.readline().strip()
 	headers = {
@@ -32,13 +32,19 @@ def make_query(foods):
 	# TODO: figure out how the input is structured
 	return ' '.join(foods)
 
-def parse_results(results, servings):
+def parse_results(results, volumes):
 	output = []
 	for i, result in enumerate(results):
 		# Just get the calorie count, sodium, and serving size for now
 		food_name = result["food_name"]
-		amnt_grams = result["serving_qty"] * result["serving_weight_grams"]
-		serving_ratio = float(servings[i]) / float(amnt_grams)
+		if result["serving_unit"] == "cup":
+			volume_in_cups = volumes[i] * CUBINCH_TO_CUP
+			grams_p_serving = result["serving_weight_grams"]
+			food_weight = volume_in_cups * grams_p_serving
+			serving_ratio = food_weight / grams_p_serving
+		else: 
+			serving_ratio = 1.0
+
 		calories = float(result["nf_calories"]) * serving_ratio
 		sodium = float(result["nf_sodium"]) * serving_ratio
 		result_dict = {
@@ -49,12 +55,12 @@ def parse_results(results, servings):
 		output.append(result_dict)
 	return output
 
-def nutritional_info(foods, servings):
+def nutritional_info(foods, volumes):
 	headers = get_auth_headers()
 	query_string = make_query(foods)
 	print query_string
 	data = { 'query' : query_string }
 	result = requests.post(url = NX_ENDPOINT, data = dumps(data), headers = headers)
 	result.raise_for_status()
-	return parse_results(result.json()["foods"], servings)
+	return parse_results(result.json()["foods"], volumes)
 	
