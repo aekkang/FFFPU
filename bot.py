@@ -5,9 +5,11 @@ import requests
 from time import sleep
 import ssl
 import shutil
-# import caloriecounter
+import nx_interface
 import gcp_interface
 import scale_and_transform
+import demo
+import food_volume
 
 BOT_ACCESS_TOKEN = config.BOT_ACCESS_TOKEN
 ACCESS_TOKEN = config.ACCESS_TOKEN
@@ -150,22 +152,44 @@ class SlackBot():
             self.download_image(event['file']['url_private_download'], name)
             print('Downloaded %s' % file_id)
 
-            labels = gcp_interface.gcp_labeller(GCP_API_KEY, name)
-            if len(labels) > 0:
-                self.send_message('You\'re consuming: %s!' % labels[0], channel)
+            n = demo.segment_image(name)
+            foods = []
+            for i in range(1, n):
+                segmented = '%s_%d.jpg' % (name[:-4], i)
+                labels = gcp_interface.gcp_labeller(GCP_API_KEY, segmented)
+                print(segmented, i, labels)
+                if len(labels) > 0:
+                    for j in range(len(labels)):
+                        if labels[j] not in foods:
+                            foods.append(labels[j])
+                            break
+
+            if len(foods) > 1:
+                self.send_message('You\'re consuming:' % foods[0], channel)
+                for food in foods:
+                    self.send_message('\t- %s!' % food, channel)
+            elif len(foods) == 1:
+                self.send_message('You\'re consuming %s!' % foods[0], channel)
             else:
                 self.send_message('Nothing detected :(', channel)
 
-            out_name, invden = scale_and_transform.process_image(name)
-            print(out_name)
+            # out_name, invden = scale_and_transform.process_image(name)
+            # print(out_name)
 
-            # nutrition = caloriecounter.count(name)
-            # caloriecounter.print_nutrition_info(nutrition)
-            
+            ### SEGMENTATION STUFF
+
             # COMMENT THIS OUT AFTER ADDING IN CALORIE CODE
-            self.update(prename, 0, 0)
-            self.update(prename, -1, -1)
-            ### INSERT CALORIE CODE HERE
+            # self.update(prename, 0, 0)
+            # self.update(prename, -1, -1)
+
+            ### VOLUME ESTIMATION, RETRIEVE NUTRITION INFORMATION
+            ### TODO: actually create the needed segmentation variables
+            
+            food_volumes = food_volume.volume_estimation(birdseye_segmented,
+                angle_segmented, invden, list_of_foods)
+            nutrition_info = nx_interface.nutritional_info(list_of_foods,
+                food_volumes)
+
             ############self.update(prename, 100, 0.1)
         elif 'type' in event and event['type'] == 'message':
             message = event['text']

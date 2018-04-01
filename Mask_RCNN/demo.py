@@ -78,7 +78,7 @@ for filename in filenames:
 print(times)
 
 def segment_image(filename):
-    """segments an image, outputting segmentted masks and files with
+    """segments an image, outputting segmentted masks and files with            
     the segmented masked applied."""
     start = time.time()
     image = skimage.io.imread(filename)
@@ -87,10 +87,13 @@ def segment_image(filename):
     end = time.time()
     print(end - start)
 
+    collapsed = collapse_segmentation(r)
     for i in range(len(r[0][0])):
-        scipy.misc.imsave(filename[:-4] + str(i + 1) + '.jpg', image * \
-                          np.reshape(r[:,:, i], (r.shape[0], r.shape[1], 1)))
-    np.savetxt(filename[:-4] + '_mask.txt', collapse_segmentation(r), fmt='%d')
+        scipy.misc.imsave(filename[:-4] + '_' + str(i + 1) + '.jpg',
+                          image * np.reshape(collapsed == (i + 1),
+                                             (r.shape[0], r.shape[1], 1)))
+
+    np.savetxt(filename[:-4] + '_mask.txt', collapsed, fmt='%d')
 
 segment_image('cheeza3.jpg')
         

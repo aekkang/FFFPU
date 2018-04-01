@@ -1,1 +1,2 @@
-{'name': 'U9U02D03B', 'currcalories': 0, 'calorielimit': 1500, 'currsodium': 0, 'sodiumlimit': 2500, 'num_meals': 0}
+{'calorielimit': 2200, 'currsodium': 0, 'sodiumlimit': 2300, 'name': 'U9ZR3Q1ML', 'num_meals': 0, 'currcalories': 0}
+{'calorielimit': 1500, 'currsodium': 0, 'sodiumlimit': 2500, 'name': 'U9U02D03B', 'num_meals': 0, 'currcalories': 0}
