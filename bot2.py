@@ -5,6 +5,7 @@ import requests
 from time import sleep
 import ssl
 import shutil
+# import caloriecounter
 
 BOT_ACCESS_TOKEN = config.BOT_ACCESS_TOKEN
 ACCESS_TOKEN = config.ACCESS_TOKEN
@@ -68,6 +69,45 @@ class SlackBot():
         """
         pass
 
+    def update(self, name, add_calories, add_sodium):
+        """
+        @brief      Update user's caloric info.
+        
+        @param      name          The user name
+        @param      add_calories  The addl. calories
+        @param      add_sodium    The addl. sodium
+
+        Note: if add* < 0, this function is essentially clear()
+        """
+        # load file
+        users = {}
+        with open('fffdb.txt', 'r') as f:
+            for line in f:
+                temp = eval(line)
+                users[temp['name']] = temp
+
+        if name in users and add_calories >= 0 and add_sodium >= 0:
+            # update user
+            users[name]['currcalories'] += add_calories
+            users[name]['currsodium'] += add_sodium
+            users[name]['num_meals'] += 1
+        elif name not in users:
+            users[name] = {'name': name, 
+                           'currcalories': add_calories,
+                           'currsodium': add_sodium,
+                           'num_meals': 1
+                           }
+        elif add_calories < 0 or add_sodium < 0:
+            users[name] = {'name': name,
+                           'currcalories': 0,
+                           'currsodium': 0,
+                           'num_meals': 0}
+
+        # save file
+        with open('fffdb.txt', 'w') as f:
+            for key, value in users.items():
+                f.write(str(value) + '\n')
+
     def handle_event(self, rtm_event):
         """
         @brief      Event handler.
@@ -84,9 +124,17 @@ class SlackBot():
             self.send_message('Computing calories...', channel)
             name = str(event['file']['name'])
             ext = name.split('.')[-1]
-            name = 'images/' + event['username'] + '.' + ext
+            prename = event['username']
+            name = 'images/' + prename + '.' + ext
             self.download_image(event['file']['url_private_download'], name)
             print('Downloaded %s' % file_id)
+
+            # nutrition = caloriecounter.count(name)
+            # caloriecounter.print_nutrition_info(nutrition)
+            self.update(prename, -1, 0)
+            # self.update(prename, 100, 0.1)
+        # elif check for 'end'
+        # elif check for 'clear'
 
     def activate(self):
         """
