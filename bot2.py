@@ -34,7 +34,7 @@ class SlackBot():
     #     print(res)
 
     def download_image(self, url, name):
-        headers = {'Authorization': 'Bearer ' + ACCESS_TOKEN}
+        headers = {'Authorization': 'Bearer ' + BOT_ACCESS_TOKEN}
         # res = requests.get(url, headers=headers)
         # with open(name, 'wb') as f:
         #     for chunk in res.iter_content(chunk_size=1024):
