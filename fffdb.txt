@@ -1,0 +1,2 @@
+{'currsodium': 0, 'name': 'akang', 'num_meals': 0, 'currcalories': 0}
+{'currsodium': 0, 'name': 'johnguackmbl', 'num_meals': 0, 'currcalories': 0}

@@ -1,6 +1,4 @@
-images/
 gcp_interface/gcp_api_key.txt
-fffdb.txt
 config.py
 __pycache__
 *.pyc
