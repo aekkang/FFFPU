@@ -22,6 +22,7 @@ def simple_estimation(angle, in_p_pxl, foods):
 	volumes = []
 	for category in foods:
 		vol = 2 * np.count_nonzero(angle == category)
+		vol = vol * in_p_pxl * in_p_pxl
 		volumes.append(vol)
 	return volumes
 
