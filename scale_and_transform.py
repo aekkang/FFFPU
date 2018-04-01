@@ -55,16 +55,16 @@ def process_image(fname):
 
     # perform transform
     M = cv2.getPerspectiveTransform(before, after)
-    img_copy = img.copy()
-    dst = cv2.warpPerspective(img_copy, M, tuple(list(img_copy.shape)[:2][::-1]), cv2.WARP_INVERSE_MAP)
+    # img_copy = img.copy()
+    # dst = cv2.warpPerspective(img_copy, M, tuple(list(img_copy.shape)[:2][::-1]), cv2.WARP_INVERSE_MAP)
 
-    # export results to file (appending '-transform' to fname)
-    out_name = ''.join(fname.split('.')[:-1]) + '-processed.jpg'
-    cv2.imwrite(out_name, dst)
+    # # export results to file (appending '-transform' to fname)
+    # out_name = ''.join(fname.split('.')[:-1]) + '-processed.jpg'
+    # cv2.imwrite(out_name, dst)
 
     # calculate inches per pixel
     invden = 5. / height  # inches per pixel
 
     # return
-    return (out_name, invden)
+    return (M, invden)
 

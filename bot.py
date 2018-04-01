@@ -10,6 +10,7 @@ import gcp_interface
 import scale_and_transform
 import demo
 import food_volume
+import cv2
 
 BOT_ACCESS_TOKEN = config.BOT_ACCESS_TOKEN
 ACCESS_TOKEN = config.ACCESS_TOKEN
@@ -153,8 +154,11 @@ class SlackBot():
             print('Downloaded %s' % file_id)
 
             n = demo.segment_image(name)
-            out_name, invden = scale_and_transform.process_image(name)
-            food_volumes = food_volume.volume_estimation('%s_mask.txt' % name, '%s_mask.txt' % out_name, invden, foods)
+            M, invden = scale_and_transform.process_image(name)
+            angle_mask = cv2.imread('%s_mask.txt' % name)
+            birdseye = cv2.warpPerspective(angle_mask, M, tuple(list(angle_mask.shape)[:2][::-1]), cv2.WARP_INVERSE_MAP)
+            angle = np.loadtxt('%s_mask.txt' % name)
+            food_volumes = food_volume.volume_estimation(angle, birdseye, invden, foods)
 
             foods = []
             for i in range(1, n):
