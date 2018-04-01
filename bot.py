@@ -171,7 +171,7 @@ class SlackBot():
                     #         foods.append(labels[j])
                     #         break
                     #########TODO
-                    food = nx_interface.nutritional_info(labels, [1] * len(labels))
+                    food = nx_interface.nutritional_info(labels, food_volumes)
 
                     processed = []
                     already = []
