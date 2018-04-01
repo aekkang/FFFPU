@@ -11,6 +11,7 @@ import scale_and_transform
 import demo
 import food_volume
 import cv2
+import numpy as np
 
 BOT_ACCESS_TOKEN = config.BOT_ACCESS_TOKEN
 ACCESS_TOKEN = config.ACCESS_TOKEN
@@ -154,11 +155,18 @@ class SlackBot():
             print('Downloaded %s' % file_id)
 
             n = demo.segment_image(name)
+            # try:
+            #     M, invden = scale_and_transform.process_image(name)
+            #     angle_mask = np.loadtxt('%s_mask.txt' % name)
+            #     angle_mask = np.reshape(angle_mask, [angle_mask.shape[0], angle_mask.shape[1],4])
+            #     print('yatta!')
+            #     birdseye = cv2.warpPerspective(angle_mask, M, tuple(list(angle_mask.shape)[:2][::-1]), cv2.WARP_INVERSE_MAP)
+            #     angle = np.loadtxt('%s_mask.txt' % name[:-4])
+            #     food_volumes = food_volume.volume_estimation(birdseye, angle, invden, list(range(1, n)))
+            # except:
+            angle = np.loadtxt('%s_mask.txt' % name[:-4])
             M, invden = scale_and_transform.process_image(name)
-            angle_mask = cv2.imread('%s_mask.txt' % name)
-            birdseye = cv2.warpPerspective(angle_mask, M, tuple(list(angle_mask.shape)[:2][::-1]), cv2.WARP_INVERSE_MAP)
-            angle = np.loadtxt('%s_mask.txt' % name)
-            food_volumes = food_volume.volume_estimation(angle, birdseye, invden, foods)
+            food_volumes = food_volume.simple_estimation(angle, invden, list(range(1, n)))
 
             foods = []
             for i in range(1, n):
@@ -171,7 +179,10 @@ class SlackBot():
                     #         foods.append(labels[j])
                     #         break
                     #########TODO
-                    food = nx_interface.nutritional_info(labels, food_volumes)
+                    volumes = [food_volumes[i - 1] / 50000] * len(labels)
+                    print(labels, volumes)
+                    food = nx_interface.nutritional_info(labels, volumes)
+                    print(food)
 
                     processed = []
                     already = []

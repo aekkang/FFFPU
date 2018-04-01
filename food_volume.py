@@ -18,6 +18,13 @@ def get_heights(seg_matrix, idx):
 	max_row = np.where(seg_matrix == idx)[-1][-1]
 	return abs(max_row - min_row)
 
+def simple_estimation(angle, in_p_pxl, foods):
+	volumes = []
+	for category in foods:
+		vol = 2 * np.count_nonzero(angle == category)
+		volumes.append(vol)
+	return volumes
+
 def volume_estimation(birdseye, angle, in_p_pxl, foods):
 	volumes = []
 	for category in foods:

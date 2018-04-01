@@ -41,6 +41,7 @@ def process_image(fname):
     epsilon = 0.1 * cv2.arcLength(contour, True)  # max allowed dist from approximation to true
     approx = cv2.approxPolyDP(contour, epsilon, True)
     approx = approx[:, 0, :]
+    print(approx.shape)
 
     # transform image
     height, width, _ = img.shape
@@ -51,10 +52,16 @@ def process_image(fname):
     # arbitrarily select upper left corner for index card
     init_x, init_y = (200, 200)
     before = np.float32(approx)
-    after = np.float32([[init_x, init_y], [init_x, init_y + height], [init_x + width, init_y + height], [init_x + width, init_y]])
+    after = np.float32([[init_x, init_y], 
+                        [init_x, init_y + height],
+                        [init_x + width, init_y + height], 
+                        [init_x + width, init_y]])
+    print(after.shape)
 
     # perform transform
-    M = cv2.getPerspectiveTransform(before, after)
+    # print('please give me my M')
+    # M = cv2.getPerspectiveTransform(before, after)
+    # print('*richard voice* YEyEYSYESSSSS')
     # img_copy = img.copy()
     # dst = cv2.warpPerspective(img_copy, M, tuple(list(img_copy.shape)[:2][::-1]), cv2.WARP_INVERSE_MAP)
 
@@ -66,5 +73,5 @@ def process_image(fname):
     invden = 5. / height  # inches per pixel
 
     # return
-    return (M, invden)
+    return (None, invden)
 
