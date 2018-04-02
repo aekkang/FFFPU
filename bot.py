@@ -191,6 +191,7 @@ class SlackBot():
                             already.append(i['name'])
                             processed.append(i)
                     food = processed
+                    print(food)
 
                     if len(food) > 0:
                         foods.append(food[:3])
@@ -198,13 +199,18 @@ class SlackBot():
 
             if len(foods) > 0:
                 self.send_message('You\'re consuming:', channel)
+                totc = 0
+                tots = 0
                 for food in foods:
                     food_name = [i['name'] for i in food]
                     calories = sum([i['calories'] for i in food]) / len(food)
                     sodium = sum([i['sodium'] for i in food]) / len(food)
+                    totc += calories
+                    tots += sodium
                     self.send_message('%s!' % ' / '.join(food_name).capitalize(), channel)
                     self.send_message('    - Calories: %g kCal' % calories, channel)
                     self.send_message('    - Sodium: %g mg' % sodium, channel)
+                self.update(prename, totc, tots)
             # elif len(foods) == 1:
             #     food = foods[0]
             #     food_name = [i['name'] for i in food]
@@ -231,7 +237,7 @@ class SlackBot():
 
             ############self.update(prename, 100, 0.1)
         elif 'type' in event and event['type'] == 'message':
-            message = event['text']
+            message = event['text'].lower()
             if 'set calorie ' in message:
                 climit = int(message.replace('set calorie ', '').strip())
                 print('Setting calorie limit to: %d' % climit)
@@ -247,9 +253,9 @@ class SlackBot():
                 self.update(prename, -1, -1)
                 self.send_message('Cleared!', channel)
             elif 'end' in message or 'display' in message:
+                self.display(prename, channel)
                 if 'end' in message:
                     self.update(prename, -1, -1)
-                self.display(prename, channel)
             elif 'help' in message:
                 self.send_message('Available commands:\n\ndisplay:\tDisplays current counts and limits.\nset calorie [number]:\tSet the calories limit.\nset sodium [number]:\tSet the sodium limit.\nclear:\tClear the daily counts.\nend:\tEnd the day! Display and clear counts.', channel)
 
